@@ -1,0 +1,38 @@
+version: '3.6'
+
+services:
+
+  servdb:
+    image: postgres
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./words.sql:/docker-entrypoint-initdb.d/words.sql
+    networks:
+      - my_network
+    expose:
+      - "5432/tcp"      
+
+  
+  servweb:
+    build: web
+    ports:      
+      - 80:80
+    networks:
+      - my_network
+    depends_on:
+      - servdb
+
+  servwords:
+    build: words
+    ports:
+      - 8080:8080  
+    networks:
+      - my_network
+    depends_on:
+      - servdb
+
+networks:
+  my_network:
+    driver: bridge
+
